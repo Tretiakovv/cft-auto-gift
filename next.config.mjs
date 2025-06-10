@@ -2,8 +2,8 @@
 const nextConfig = {
   output: 'export',
   // Uncomment and modify these lines if you're not using a custom domain
-  // basePath: '/your-repo-name',
-  // assetPrefix: '/your-repo-name/',
+  basePath: '/cft-auto-gift',
+  assetPrefix: '/cft-auto-gift/',
   images: {
     unoptimized: true,
   },
