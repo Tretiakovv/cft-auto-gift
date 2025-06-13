@@ -3,11 +3,11 @@ import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import path from 'path';
 
-const token = 'ybaG5v0gXNJwDxpq9tco5RbG9Z0DWw3oIGx8';
+const token = process.env.API_KEY;
 const endpoint = "https://models.github.ai/inference";
 const model = "openai/gpt-4o";
 
-const client = new OpenAI({ baseURL: endpoint, apiKey: "g" + "h" + `p_${token}` });
+const client = new OpenAI({ baseURL: endpoint, apiKey: token });
 
 /**
  * Generate a celebration wish using DeepSeek API based on person's data and celebration type
