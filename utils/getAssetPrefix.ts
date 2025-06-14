@@ -1,1 +1,1 @@
-export const getAssetPrefix = () => process.env.NODE_ENV === 'production' ? '/cft-auto-gift' : ''
+export const getAssetPrefix = () => process.env.NEXT_PUBLIC_IS_PROD === 'true' ? '/cft-auto-gift' : ''

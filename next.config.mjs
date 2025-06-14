@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export',
-  basePath: process.env.NODE_ENV === 'production' ? '/cft-auto-gift' : "",
+  output: process.env.NEXT_PUBLIC_IS_PROD === 'true' ? 'export' : "",
+  basePath: process.env.NEXT_PUBLIC_IS_PROD === 'true' ? '/cft-auto-gift' : "",
   images: {
     unoptimized: true,
   },
