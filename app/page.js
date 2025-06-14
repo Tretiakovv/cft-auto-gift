@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { Toaster, toast } from 'sonner';
 import { Button } from '../components/ui/button';
 import { handleGeneratePDF } from '../utils/generatePdf';
+import { getAssetPrefix } from '../utils/getAssetPrefix';
 import styles from './page.module.css';
 
 function Home() {
@@ -51,7 +52,7 @@ function Home() {
       <div className="flex gap-4 mb-4">
         <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4">
           <Image
-            src="/images/korona-logo.png"
+            src={getAssetPrefix() + "/images/korona-logo.png"}
             alt="Korona Logo"
             width={150}
             height={40}
@@ -60,7 +61,7 @@ function Home() {
         </div>
         <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4">
           <Image
-            src="/images/webtech-logo.png"
+            src={getAssetPrefix() + "/images/webtech-logo.png"}
             alt="Webtech Department Logo"
             width={150}
             height={40}

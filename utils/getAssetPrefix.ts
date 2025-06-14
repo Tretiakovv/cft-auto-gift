@@ -1,0 +1,1 @@
+export const getAssetPrefix = () => process.env.NODE_ENV === 'production' ? '/cft-autogift' : ''
