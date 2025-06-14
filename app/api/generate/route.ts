@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import path from 'path';
 
-const token = process.env.API_KEY;
+const token = process.env.NEXT_PUBLIC_API_KEY;
 const endpoint = "https://models.github.ai/inference";
 const model = "openai/gpt-4o";
 

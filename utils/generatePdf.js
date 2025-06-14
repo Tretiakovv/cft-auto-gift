@@ -49,7 +49,7 @@ export const handleGeneratePDF = (wishes) => {
     doc.circle(25, y, 8, 'F');
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(10);
-    doc.text((index + 1).toString(), 25, y, { align: 'center' });
+    doc.text((index + 1).toString(), 25, y + 1, { align: 'center' });
     
     // Reset text color to black for wish text
     doc.setTextColor(0, 0, 0);
