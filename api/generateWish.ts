@@ -1,18 +1,17 @@
-import fs from 'fs';
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
-import path from 'path';
+import { data } from "../data/sample";
 
 const token = process.env.NEXT_PUBLIC_API_KEY;
 const endpoint = "https://models.github.ai/inference";
 const model = "openai/gpt-4o";
 
-const client = new OpenAI({ baseURL: endpoint, apiKey: token });
+const client = new OpenAI({ baseURL: endpoint, apiKey: token, dangerouslyAllowBrowser: true });
 
 /**
  * Generate a celebration wish using DeepSeek API based on person's data and celebration type
  */
-async function generateWish(person: any, celebrationType: 'birthday' | 'anniversary', customPrompt?: string) {
+async function processWish(person: any, celebrationType: 'birthday' | 'anniversary', customPrompt?: string) {
     const defaultPrompt = `Generate a warm and personalized ${celebrationType} IN RUSSIAN LANGUAGE wish for ${person.name}. 
     Make it friendly and professional.
     ${celebrationType === 'birthday' ? `The person has birthday in this date.` : `The person's work anniversary is on ${person.anniversary}.`}
@@ -35,17 +34,8 @@ async function generateWish(person: any, celebrationType: 'birthday' | 'annivers
     }
 }
 
-export async function POST(request: Request) {
-    try {
-        // Get custom prompt from request body if provided
-        const body = await request.json();
-        const customPrompt = body?.prompt;
-
-        // Read the JSON file from public/files directory
-        const filePath = path.join(process.cwd(), 'public', 'files', 'sample.json');
-        const fileContent = fs.readFileSync(filePath, 'utf-8');
-        const data = JSON.parse(fileContent);
-        
+export async function generateWish(prompt?: string) {
+    try {        
         // Get current month (1-based)
         const currentMonth = new Date().getMonth() + 1;
 
@@ -69,7 +59,7 @@ export async function POST(request: Request) {
                 };
 
                 if (birthdayMonth === currentMonth) {
-                    const wish = await generateWish(personData, 'birthday', customPrompt);
+                    const wish = await processWish(personData, 'birthday', prompt);
                     if (wish) {
                         wishes.push({
                             type: 'birthday',
@@ -80,7 +70,7 @@ export async function POST(request: Request) {
                 }
 
                 if (anniversaryMonth === currentMonth) {
-                    const wish = await generateWish(personData, 'anniversary', customPrompt);
+                    const wish = await processWish(personData, 'anniversary', prompt);
                     if (wish) {
                         wishes.push({
                             type: 'anniversary',

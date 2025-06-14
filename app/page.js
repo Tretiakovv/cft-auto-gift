@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { Toaster, toast } from 'sonner';
+import { generateWish } from '../api/generateWish';
 import { Button } from '../components/ui/button';
 import { handleGeneratePDF } from '../utils/generatePdf';
 import { getAssetPrefix } from '../utils/getAssetPrefix';
@@ -23,13 +24,7 @@ function Home() {
       setIsLoading(true);
 
       // Call the API route
-      const response = await fetch('/api/generate', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ prompt }),
-      });
+      const response = await generateWish(prompt);
 
       if (!response.ok) {
         throw new Error('Failed to generate wishes');
