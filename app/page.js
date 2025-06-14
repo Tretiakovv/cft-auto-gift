@@ -7,13 +7,6 @@ import { Button } from '../components/ui/button';
 import { handleGeneratePDF } from '../utils/generatePdf';
 import { getAssetPrefix } from '../utils/getAssetPrefix';
 import styles from './page.module.css';
-import OpenAI from 'openai';
-
-const token = process.env.NEXT_PUBLIC_API_KEY;
-const endpoint = "https://models.github.ai/inference";
-const model = "openai/gpt-4o";
-
-const client = new OpenAI({ baseURL: endpoint, apiKey: token, dangerouslyAllowBrowser: true });
 
 function Home() {
   const [prompt, setPrompt] = useState('');
@@ -30,11 +23,12 @@ function Home() {
       setIsLoading(true);
 
       // Call the API route
-      const response = await fetch('/api/test', {
+      const response = await fetch('/api/generate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
+        body: JSON.stringify({ prompt }),
       });
 
       if (!response.ok) {
