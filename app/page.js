@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Toaster, toast } from 'sonner';
 import { Button } from '../components/ui/button';
 import { handleGeneratePDF } from '../utils/generatePdf';
@@ -12,6 +12,10 @@ function Home() {
   const [prompt, setPrompt] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  useEffect(() => {
+    alert(process.env.NEXT_PUBLIC_API_KEY);
+  }, [ ])
 
   const handleGenerate = async () => {
     try {

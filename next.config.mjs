@@ -1,9 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'export',
-  // Uncomment and modify these lines if you're not using a custom domain
-  basePath: '/cft-auto-gift',
-  // assetPrefix: '/cft-auto-gift/',
+  basePath: process.env.NODE_ENV === 'production' ? '/cft-auto-gift' : "",
   images: {
     unoptimized: true,
   },
