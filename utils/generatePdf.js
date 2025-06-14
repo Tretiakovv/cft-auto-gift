@@ -44,17 +44,12 @@ export const handleGeneratePDF = (wishes) => {
       y = 40;
     }
     
-    // Add decorative divider
-    doc.setDrawColor(41, 128, 185);
-    doc.setLineWidth(0.5);
-    doc.line(15, y - 5, 195, y - 5);
-    
     // Add wish number with decorative circle
     doc.setFillColor(41, 128, 185);
     doc.circle(25, y, 8, 'F');
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(10);
-    doc.text((index + 1).toString(), 25, y + 3, { align: 'center' });
+    doc.text((index + 1).toString(), 25, y, { align: 'center' });
     
     // Reset text color to black for wish text
     doc.setTextColor(0, 0, 0);
