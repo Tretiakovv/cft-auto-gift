@@ -48,7 +48,6 @@ function Home() {
   return (
     <main className={`min-h-screen flex flex-col items-center justify-center ${styles.shimmeringBackground} p-4`}>
       <Toaster visibleToasts={1} position="bottom-right" />
-      {/* Logo Container */}
       <div className="flex gap-4 mb-4">
         <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4">
           <Image
