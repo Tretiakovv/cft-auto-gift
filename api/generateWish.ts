@@ -1,5 +1,3 @@
-import ModelClient, { isUnexpected } from "@azure-rest/ai-inference";
-import { AzureKeyCredential } from "@azure/core-auth";
 import { jsonrepair } from "jsonrepair";
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
@@ -7,22 +5,23 @@ import { data } from "../data/sample";
 
 const token = process.env.NEXT_PUBLIC_API_KEY;
 const endpoint = "https://models.github.ai/inference";
-const model = "deepseek/DeepSeek-R1";
 
-const deepseek = ModelClient(endpoint, new AzureKeyCredential(token));
-
-const client = new OpenAI({ baseURL: endpoint, apiKey: token, dangerouslyAllowBrowser: true });
+const openai = new OpenAI({
+    apiKey: process.env.OPENROUTER_KEY,
+    baseURL: 'https://openrouter.ai/api/v1',
+});
 
 /**
  * Generate celebration wishes for all relevant employees in a single OpenAI request
  */
 async function processWishesForAll(employees: any[], customPrompt?: string) {
-    // Build a prompt listing all employees and their celebration type
-    let prompt = `Generate warm and personalized wishes IN RUSSIAN LANGUAGE for the following people.\n`;
-    prompt += `For each person, generate a wish for their celebration (birthday or anniversary), make it friendly and professional.\n`;
+    let prompt = `Generate warm and personalized wishes IN RUSSIAN LANGUAGE MINIMUN 3 SENTENCES for the following people.\n`;
+    prompt += `For each person, generate a wish for their celebration (birthday or anniversary IN THE COMPANY), make it friendly and professional.\n`;
     prompt += `Return the result as a JSON array of objects with fields: type ("birthday" or "anniversary"), person (name), and wish.\n`;
+
     if (customPrompt) prompt += ` ${customPrompt}\n`;
     prompt += `\nPeople:\n`;
+
     for (const emp of employees) {
         prompt += `- Name: ${emp.name}, Celebration: ${emp.type}, Position: ${emp.position}, Job: ${emp.job}\n`;
     }
@@ -31,26 +30,17 @@ async function processWishesForAll(employees: any[], customPrompt?: string) {
         "\n IMPORTANT: Return ONLY a valid JSON array as described, with no extra text, comments, or explanations. Do not break the JSON structure. If the output is too long, split into multiple arrays but always return valid JSON.";
 
     try {
-        const response = await deepseek.path("/chat/completions").post({
-            body: {
-                messages: [{ role: "system", content: prompt }],
-                max_tokens: 2048,
-                model,
-            },
+        const completion = await openai.chat.completions.create({
+            model: 'deepseek/deepseek-r1-0528-qwen3-8b:free',
+            messages: [
+                {
+                    role: 'user',
+                    content: prompt,
+                },
+            ],
         });
 
-        // const completion = await client.chat.completions.create({
-        //     messages: [{ role: "system", content: prompt }],
-        //     temperature: 1.0,
-        //     top_p: 1.0,
-        //     model: model,
-        // });
-
-        if (isUnexpected(response)) {
-            throw response.body.error;
-        }
-
-        return response.body.choices[0].message.content;
+        return completion.choices[0].message.content;
     } catch (error) {
         console.error("Error generating wishes:", error);
         return null;
@@ -92,6 +82,7 @@ export async function generateWish(prompt?: string) {
                     job: person["Должность"],
                 });
             }
+
             if (anniversaryMonth === currentMonth) {
                 employeesToCongratulate.push({
                     name: person["ФИО"],
@@ -109,48 +100,27 @@ export async function generateWish(prompt?: string) {
         // Split into batches of 5
         const batches = chunkArray(employeesToCongratulate, 5);
         let allWishes: any[] = [];
-        let rateLimitHit = false;
 
         for (const batch of batches) {
-            let wishesRaw;
-
-            try {
-                wishesRaw = await processWishesForAll(batch, prompt);
-            } catch (error: any) {
-                // If error is RateLimitExceed, break and return what we have
-                if (error && error.response.code === "RateLimitReached") {
-                    rateLimitHit = true;
-                    break;
-                } else {
-                    throw error;
-                }
-            }
-
-            // Remove <think> block if present
-            let wishesText = wishesRaw;
-            const thinkEndIdx = wishesRaw.indexOf("</think>");
-            if (thinkEndIdx !== -1) {
-                wishesText = wishesRaw.slice(thinkEndIdx + 8); // 8 = length of '</think>'
-            }
-
-            const [startIdx, endIdx] = [wishesText.indexOf("["), wishesText.lastIndexOf("]")];
-            const processedWishes = wishesText.slice(startIdx, endIdx + 1);
+            let wishesRaw = await processWishesForAll(batch, prompt);
 
             let wishes: any[] = [];
             try {
-                wishes = JSON.parse(processedWishes);
+                wishes = JSON.parse(wishesRaw);
             } catch {
                 try {
-                    wishes = JSON.parse(jsonrepair(processedWishes));
+                    wishes = JSON.parse(jsonrepair(wishesRaw));
                 } catch {
-                    wishes = [{ raw: processedWishes }];
+                    wishes = [{ raw: wishesRaw }];
                 }
             }
 
             allWishes = allWishes.concat(wishes);
         }
 
-        return NextResponse.json({ wishes: allWishes, rateLimitHit });
+        console.log('ALL_WISHES', allWishes);
+
+        return NextResponse.json({ wishes: allWishes });
     } catch (error) {
         console.log("Error processing request:", error);
         return NextResponse.json({ error: "Failed to generate wishes" }, { status: 500 });

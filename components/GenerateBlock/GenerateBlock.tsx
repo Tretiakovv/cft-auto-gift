@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
-import { generateWish } from "../../api/generateWish";
 import { handleGeneratePDF } from "../../utils/generatePdf";
 import { Button } from "../ui/button";
 
@@ -14,24 +13,26 @@ export const GenerateBlock = () => {
         try {
             setIsLoading(true);
 
-            const response = await generateWish(prompt);
+            const response = await fetch("/api/generate", {
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ prompt }),
+                method: "POST",
+            });
 
             if (!response.ok) {
                 throw new Error("Failed to generate wishes");
             }
 
-            const { wishes, rateLimitHit } = await response.json();
+            const { wishes } = await response.json();
 
-            if (rateLimitHit) {
-                toast.info("Обработали часть запроса, продолжаем далее");
-            } else if (wishes?.length > 0) {
+            if (wishes?.length > 0) {
                 await handleGeneratePDF(wishes.map((wish) => wish.wish));
             } else {
                 toast.error("Не удалось сгенерировать поздравление");
             }
         } catch (err) {
             toast.error("Произошла ошибка при генерации");
-            console.error('asasasas', err);
+            console.error("asasasas", err);
         } finally {
             setIsLoading(false);
         }

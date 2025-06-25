@@ -29,7 +29,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      NEXT_PUBLIC_API_KEY: ${{ secrets.API_KEY }}
+      OPENROUTER_KEY: ${{ secrets.OPENROUTER_KEY }}
       NEXT_PUBLIC_IS_PROD: true
     steps:
       - name: Checkout
